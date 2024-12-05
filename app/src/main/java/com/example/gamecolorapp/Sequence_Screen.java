@@ -1,5 +1,6 @@
 package com.example.gamecolorapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -21,10 +22,10 @@ public class Sequence_Screen extends AppCompatActivity {
     private View viewRed, viewBlue, viewYellow, viewGreen;
 
     // List of all circle IDs
-    private List<Integer> circleIds;
+    private static List<Integer> circleIds;
 
     // Random sequence of colors
-    private List<Integer> randomSequence;
+    private static List<Integer> randomSequence;
 
     // Handler for delays
     private Handler handler = new Handler();
@@ -53,16 +54,28 @@ public class Sequence_Screen extends AppCompatActivity {
         circleIds.add(R.id.viewYellow);
         circleIds.add(R.id.viewGreen);
 
-        // Generate a random sequence
-        generateRandomSequence(4); // Generate a sequence of 4 colors
+        // Retrieve sequence data from the intent if available
+        Intent intent = getIntent();
+        int[] sequenceArray = intent.getIntArrayExtra("sequence");
 
-        // Start the sequence
+        // If there's a new sequence passed from PlayScreen
+        if (sequenceArray != null) {
+            randomSequence = new ArrayList<>();
+            for (int color : sequenceArray) {
+                randomSequence.add(color);
+            }
+        } else {
+            // Generate a random sequence if it's the first time (or add more colors based on game progression)
+            generateRandomSequence(4);  // You can start with a sequence of 4 colors
+        }
+
+        // Start showing the sequence to the user
         showSequence();
 
     }
 
     // Method to generate a random sequence of circle IDs
-    private void generateRandomSequence(int length) {
+    public static void generateRandomSequence(int length) {
         randomSequence = new ArrayList<>();
         Random random = new Random();
 
@@ -79,6 +92,10 @@ public class Sequence_Screen extends AppCompatActivity {
             handler.postDelayed(() -> lightUpCircle(id), delay[0]);
             delay[0] += 1000; // 1 second delay between each light-up
         }
+
+        // After the sequence finishes, navigate to the PlayScreen
+        // Set the delay to be after the last circle in the sequence
+        handler.postDelayed(() -> goToPlayScreen(), delay[0] + 500); // Add an extra 500ms to give time for the last light-up
     }
 
     // Method to light up a single circle
@@ -117,6 +134,25 @@ public class Sequence_Screen extends AppCompatActivity {
     // Method to reset a circle's background color
     private void resetCircle(View circle) {
         circle.setBackgroundResource(R.drawable.circle_background); // Reset to original drawable
+    }
+
+    //a method to go to play screen
+    private void goToPlayScreen() {
+        // Convert the randomSequence list to an int array
+        int[] sequenceArray = new int[randomSequence.size()];
+        for (int i = 0; i < randomSequence.size(); i++) {
+            sequenceArray[i] = randomSequence.get(i);
+        }
+
+
+        //intent to start sequence activity
+        Intent intent = new Intent(Sequence_Screen.this, PlayScreen.class);
+
+        // Pass the sequence to PlayScreen via Intent
+        intent.putExtra("sequence", sequenceArray);
+
+        // Start PlayScreen
+        startActivity(intent);
     }
 
 }
