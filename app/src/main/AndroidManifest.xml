@@ -9,13 +9,19 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
+        android:screenOrientation="landscape"
         android:supportsRtl="true"
         android:theme="@style/Theme.GameColorApp"
         tools:targetApi="31">
         <activity
+            android:name=".PlayScreen"
+            android:exported="false" />
+        <activity
+            android:name=".Sequence_Screen"
+            android:exported="true" />
+        <activity
             android:name=".MainActivity"
-            android:exported="true"
-            android:screenOrientation="landscape">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
