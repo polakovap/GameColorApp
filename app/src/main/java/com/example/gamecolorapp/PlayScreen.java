@@ -1,5 +1,6 @@
 package com.example.gamecolorapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -9,10 +10,11 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 //new imports
+import android.util.Log;
 import android.widget.Button;
-import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class PlayScreen extends AppCompatActivity {
     private List<Integer> randomSequence;  // Sequence of colors to match
@@ -31,6 +33,11 @@ public class PlayScreen extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        //get intent
+        Intent intent = getIntent();
+        String playerName = intent.getStringExtra("playerName");
+
         //initialize the sequences
         randomSequence = new ArrayList<>();
         playerInput = new ArrayList<>();
@@ -79,18 +86,55 @@ public class PlayScreen extends AppCompatActivity {
 
     //method to show game over
     private void gameOver() {
-        // Show a Toast for now
-        Toast.makeText(this, "Game Over! Final score: " + score, Toast.LENGTH_SHORT).show();
+        // Get the player name from the Intent
+        String playerName = getIntent().getStringExtra("playerName");
+
+        // Check if playerName is null or empty before proceeding
+        if (playerName == null || playerName.trim().isEmpty()) {
+            Log.e("PlayScreen", "Player name is null or empty!");
+            return;  // Do not proceed if playerName is invalid
+        }
+
+        ScoresDataSource dataSource = new ScoresDataSource(this);
+        dataSource.open();
+
+        // Log to ensure playerName and score are valid
+        Log.d("PlayScreen", "Saving score for " + playerName + ": " + score);
+
+        // Add/update the player's score in the database
+        dataSource.addOrUpdateScore(playerName, score);
+        dataSource.close();
+
+        //navigate to the GameOver screen
+        Intent intent = new Intent(this, GameOverScreen.class);
+        intent.putExtra("playerName", playerName);
+        intent.putExtra("score", score);
+
+        startActivity(intent);
+        finish();
     }
 
     //method to get a new sequence
     private void generateNewSequence() {
+        // Get the player name from the Intent
+        String playerName = getIntent().getStringExtra("playerName");
+
         //increase the sequence length by 2
         int newLength = randomSequence.size() + 2;
 
         //generate a new sequence with the increased length
-        randomSequence.clear(); //clear old sequence
-        Sequence_Screen.generateRandomSequence(newLength);
+        // Generate a new sequence
+        List<Integer> newSequence = new ArrayList<>();
+        Random random = new Random();
+        for (int i = 0; i < newLength; i++) {
+            newSequence.add(randomSequence.get(random.nextInt(randomSequence.size())));
+        }
+
+        // Pass the new sequence to Sequence_Screen
+        Intent intent = new Intent(this, Sequence_Screen.class);
+        intent.putExtra("sequence", newSequence.stream().mapToInt(Integer::intValue).toArray());
+        intent.putExtra("playerName", playerName);
+        startActivity(intent);
 
         //go back to sequence screen
         finish();

@@ -56,6 +56,7 @@ public class Sequence_Screen extends AppCompatActivity {
 
         // Retrieve sequence data from the intent if available
         Intent intent = getIntent();
+        String playerName = intent.getStringExtra("playerName");
         int[] sequenceArray = intent.getIntArrayExtra("sequence");
 
         // If there's a new sequence passed from PlayScreen
@@ -70,7 +71,7 @@ public class Sequence_Screen extends AppCompatActivity {
         }
 
         // Start showing the sequence to the user
-        showSequence();
+        showSequence(playerName);
 
     }
 
@@ -86,8 +87,8 @@ public class Sequence_Screen extends AppCompatActivity {
     }
 
     // Method to light up circles in the random sequence
-    private void showSequence() {
-        final int[] delay = {0}; // Initial delay
+    private void showSequence(String playerName) {
+        final int[] delay = {1000}; // Initial delay
         for (int id : randomSequence) {
             handler.postDelayed(() -> lightUpCircle(id), delay[0]);
             delay[0] += 1000; // 1 second delay between each light-up
@@ -95,7 +96,7 @@ public class Sequence_Screen extends AppCompatActivity {
 
         // After the sequence finishes, navigate to the PlayScreen
         // Set the delay to be after the last circle in the sequence
-        handler.postDelayed(() -> goToPlayScreen(), delay[0] + 500); // Add an extra 500ms to give time for the last light-up
+        handler.postDelayed(() -> goToPlayScreen(playerName), delay[0] + 500); // Add an extra 500ms to give time for the last light-up
     }
 
     // Method to light up a single circle
@@ -137,7 +138,7 @@ public class Sequence_Screen extends AppCompatActivity {
     }
 
     //a method to go to play screen
-    private void goToPlayScreen() {
+    private void goToPlayScreen(String playerName) {
         // Convert the randomSequence list to an int array
         int[] sequenceArray = new int[randomSequence.size()];
         for (int i = 0; i < randomSequence.size(); i++) {
@@ -148,8 +149,9 @@ public class Sequence_Screen extends AppCompatActivity {
         //intent to start sequence activity
         Intent intent = new Intent(Sequence_Screen.this, PlayScreen.class);
 
-        // Pass the sequence to PlayScreen via Intent
+        // Pass the sequence and plyerName to PlayScreen via Intent
         intent.putExtra("sequence", sequenceArray);
+        intent.putExtra("playerName", playerName);
 
         // Start PlayScreen
         startActivity(intent);
