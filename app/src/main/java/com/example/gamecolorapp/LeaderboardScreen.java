@@ -29,6 +29,10 @@ public class LeaderboardScreen extends AppCompatActivity {
             return insets;
         });
 
+        // Retrieve sequence data from the intent if available
+        Intent intent = getIntent();
+        int score = intent.getIntExtra("score", 0);
+
         //get the back button and listview
         Button btnBack = findViewById(R.id.btnBack);
         ListView lvLeaderboard = findViewById(R.id.lvLeaderboard);
@@ -49,6 +53,7 @@ public class LeaderboardScreen extends AppCompatActivity {
             public void onClick(View view) {
                 //intent to start sequence activity
                 Intent intent = new Intent(LeaderboardScreen.this, GameOverScreen.class);
+                intent.putExtra("score", score);
                 startActivity(intent);
             }
         });

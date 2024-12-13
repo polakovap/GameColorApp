@@ -38,6 +38,7 @@ public class GameOverScreen extends AppCompatActivity {
 
         btnLeaderboard.setOnClickListener(view -> {
             Intent intent = new Intent(this, LeaderboardScreen.class);
+            intent.putExtra("score", score);
             startActivity(intent);
         });
 

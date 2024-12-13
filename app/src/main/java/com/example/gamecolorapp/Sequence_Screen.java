@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat;
 //new imports
 import android.graphics.Color;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +59,11 @@ public class Sequence_Screen extends AppCompatActivity {
         Intent intent = getIntent();
         String playerName = intent.getStringExtra("playerName");
         int[] sequenceArray = intent.getIntArrayExtra("sequence");
+        int score = intent.getIntExtra("score", 0);
+
+        //log for debugging
+        Log.d("Sequence_Screen", "Player: " + playerName + ", Current Score: " + score);
+
 
         // If there's a new sequence passed from PlayScreen
         if (sequenceArray != null) {
@@ -71,7 +77,7 @@ public class Sequence_Screen extends AppCompatActivity {
         }
 
         // Start showing the sequence to the user
-        showSequence(playerName);
+        showSequence(playerName, score);
 
     }
 
@@ -87,7 +93,7 @@ public class Sequence_Screen extends AppCompatActivity {
     }
 
     // Method to light up circles in the random sequence
-    private void showSequence(String playerName) {
+    private void showSequence(String playerName, int score) {
         final int[] delay = {1000}; // Initial delay
         for (int id : randomSequence) {
             handler.postDelayed(() -> lightUpCircle(id), delay[0]);
@@ -96,7 +102,7 @@ public class Sequence_Screen extends AppCompatActivity {
 
         // After the sequence finishes, navigate to the PlayScreen
         // Set the delay to be after the last circle in the sequence
-        handler.postDelayed(() -> goToPlayScreen(playerName), delay[0] + 500); // Add an extra 500ms to give time for the last light-up
+        handler.postDelayed(() -> goToPlayScreen(playerName, score), delay[0] + 500); // Add an extra 500ms to give time for the last light-up
     }
 
     // Method to light up a single circle
@@ -138,7 +144,7 @@ public class Sequence_Screen extends AppCompatActivity {
     }
 
     //a method to go to play screen
-    private void goToPlayScreen(String playerName) {
+    private void goToPlayScreen(String playerName, int score) {
         // Convert the randomSequence list to an int array
         int[] sequenceArray = new int[randomSequence.size()];
         for (int i = 0; i < randomSequence.size(); i++) {
@@ -149,9 +155,10 @@ public class Sequence_Screen extends AppCompatActivity {
         //intent to start sequence activity
         Intent intent = new Intent(Sequence_Screen.this, PlayScreen.class);
 
-        // Pass the sequence and plyerName to PlayScreen via Intent
+        // Pass the sequence, plyerName, and score to PlayScreen via Intent
         intent.putExtra("sequence", sequenceArray);
         intent.putExtra("playerName", playerName);
+        intent.putExtra("score", score);
 
         // Start PlayScreen
         startActivity(intent);

@@ -37,6 +37,10 @@ public class PlayScreen extends AppCompatActivity {
         //get intent
         Intent intent = getIntent();
         String playerName = intent.getStringExtra("playerName");
+        score = intent.getIntExtra("score", 0);  // Get accumulated score from Intent
+
+        // Log the current score for debugging
+        Log.d("PlayScreen", "Current accumulated score: " + score);
 
         //initialize the sequences
         randomSequence = new ArrayList<>();
@@ -130,10 +134,11 @@ public class PlayScreen extends AppCompatActivity {
             newSequence.add(randomSequence.get(random.nextInt(randomSequence.size())));
         }
 
-        // Pass the new sequence to Sequence_Screen
+        // Pass the new sequence to Sequence_Screen along with the playerName and their score
         Intent intent = new Intent(this, Sequence_Screen.class);
         intent.putExtra("sequence", newSequence.stream().mapToInt(Integer::intValue).toArray());
         intent.putExtra("playerName", playerName);
+        intent.putExtra("score", score);
         startActivity(intent);
 
         //go back to sequence screen
