@@ -13,6 +13,8 @@ import android.graphics.Color;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -24,6 +26,7 @@ public class Sequence_Screen extends AppCompatActivity {
 
     // List of all circle IDs
     private static List<Integer> circleIds;
+    private static List<Integer> lightbulbIds;
 
     // Random sequence of colors
     private static List<Integer> randomSequence;
@@ -137,6 +140,7 @@ public class Sequence_Screen extends AppCompatActivity {
 
         }
     }
+
 
     // Method to reset a circle's background color
     private void resetCircle(View circle) {

@@ -2,6 +2,7 @@ package com.example.gamecolorapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,23 +17,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+//imports for accelerometer
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.widget.Toast;
+
 public class PlayScreen extends AppCompatActivity {
     private List<Integer> randomSequence;  // Sequence of colors to match
     private List<Integer> playerInput;     // Player's input
     private int currentStep = 0;           // Track the current step of the sequence
     private int score = 0;                 // Track score
 
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
+    private SensorEventListener sensorEventListener;
+    private boolean isFlat = false;  // Tracks whether the phone is in a neutral position
+
+    private Button btnRed, btnBlue, btnGreen, btnYellow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_play_screen);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
 
         //get intent
         Intent intent = getIntent();
@@ -57,16 +66,101 @@ public class PlayScreen extends AppCompatActivity {
         }
 
         //get buttons
-        Button btnRed = findViewById(R.id.btnRed);
-        Button btnBlue = findViewById(R.id.btnBlue);
-        Button btnGreen = findViewById(R.id.btnGreen);
-        Button btnYellow = findViewById(R.id.btnYellow);
+        btnRed = findViewById(R.id.btnRed);
+        btnBlue = findViewById(R.id.btnBlue);
+        btnGreen = findViewById(R.id.btnGreen);
+        btnYellow = findViewById(R.id.btnYellow);
 
         //set listeners for buttons
         btnRed.setOnClickListener(view -> onButtonPressed(R.id.viewRed));
         btnBlue.setOnClickListener(view -> onButtonPressed(R.id.viewBlue));
         btnGreen.setOnClickListener(view -> onButtonPressed(R.id.viewGreen));
         btnYellow.setOnClickListener(view -> onButtonPressed(R.id.viewYellow));
+
+        // Initialize accelerometer
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        if (accelerometer != null) {
+            initializeAccelerometerListener();
+        } else {
+            Toast.makeText(this, "Accelerometer not available", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void initializeAccelerometerListener() {
+        sensorEventListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                float x = event.values[0];
+                float y = event.values[1];
+                float z = event.values[2];
+
+                // Example logic for tilt direction
+                int tiltNegativeLimit = -3;
+                int tiltPositiveLimit = 3;
+                int tiltNeutralNegativeLimit = -1;
+                int tiltNeutralPositiveLimit = 1;
+
+                // Detect if the phone is in flat position
+                if (x > tiltNeutralNegativeLimit && x < tiltNeutralPositiveLimit
+                        && y > tiltNeutralNegativeLimit && y < tiltNeutralPositiveLimit) {
+                    isFlat = true;
+                }
+
+                // Handle tilt only if phone is flat
+                if (isFlat) {
+                    if (y < tiltNegativeLimit) {
+                        // Phone tilted to the right
+                        handleTilt("right");
+                    } else if (y > tiltPositiveLimit) {
+                        // Phone tilted to the left
+                        handleTilt("left");
+                    } else if (x > tiltPositiveLimit) {
+                        // Phone tilted forward
+                        handleTilt("forward");
+                    } else if (x < tiltNegativeLimit) {
+                        // Phone tilted backward
+                        handleTilt("backward");
+                    }
+                }
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+                // Handle accuracy changes
+            }
+        };
+
+        // Register the listener for accelerometer
+        sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_UI);
+    }
+
+    // Handle tilt direction and map it to a button press
+    private void handleTilt(String direction) {
+        // Map direction to button press
+        int buttonId = mapDirectionToButtonId(direction);
+        if (buttonId != -1) {
+            onButtonPressed(buttonId); // Simulate button press based on tilt
+        } else {
+            Toast.makeText(this, "Tilt again", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Map tilt direction to button
+    private int mapDirectionToButtonId(String direction) {
+        switch (direction) {
+            case "left":
+                return R.id.viewBlue; // blue button
+            case "forward":
+                return R.id.viewRed; // red button
+            case "right":
+                return R.id.viewYellow; // yellow button
+            case "backward":
+                return R.id.viewGreen; // green button
+            default:
+                return -1; // Invalid direction
+        }
     }
 
     //method to handle button presses
@@ -143,5 +237,22 @@ public class PlayScreen extends AppCompatActivity {
 
         //go back to sequence screen
         finish();
+    }
+
+    // Handle onResume and onPause for accelerometer listener
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (sensorManager != null && accelerometer != null) {
+            sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_UI);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (sensorManager != null && accelerometer != null) {
+            sensorManager.unregisterListener(sensorEventListener);
+        }
     }
 }

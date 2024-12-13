@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#D2EDF8"
     tools:context=".Sequence_Screen"
     tools:layout_editor_absoluteX="-123dp"
     tools:layout_editor_absoluteY="0dp">
@@ -67,5 +68,47 @@
         app:layout_constraintHorizontal_bias="0.625"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/guideline_horizontal_center" />
+
+    <ImageView
+        android:id="@+id/ivRed"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:layout_constraintBottom_toBottomOf="@+id/viewRed"
+        app:layout_constraintEnd_toEndOf="@+id/viewRed"
+        app:layout_constraintStart_toStartOf="@+id/viewRed"
+        app:layout_constraintTop_toTopOf="@+id/viewRed"
+        app:srcCompat="@drawable/light_bulb_icon" />
+
+    <ImageView
+        android:id="@+id/ivYellow"
+        android:layout_width="100sp"
+        android:layout_height="100sp"
+        app:layout_constraintBottom_toBottomOf="@+id/viewYellow"
+        app:layout_constraintEnd_toEndOf="@+id/viewYellow"
+        app:layout_constraintStart_toStartOf="@+id/viewYellow"
+        app:layout_constraintTop_toTopOf="@+id/viewYellow"
+        app:srcCompat="@drawable/light_bulb_icon" />
+
+    <ImageView
+        android:id="@+id/ivGreen"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:layout_constraintBottom_toBottomOf="@+id/viewGreen"
+        app:layout_constraintEnd_toEndOf="@+id/viewGreen"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/viewGreen"
+        app:layout_constraintTop_toTopOf="@+id/viewGreen"
+        app:srcCompat="@drawable/light_bulb_icon" />
+
+    <ImageView
+        android:id="@+id/ivBlue"
+        android:layout_width="100sp"
+        android:layout_height="100sp"
+        app:layout_constraintBottom_toBottomOf="@+id/viewBlue"
+        app:layout_constraintEnd_toEndOf="@+id/viewBlue"
+        app:layout_constraintStart_toStartOf="@+id/viewBlue"
+        app:layout_constraintTop_toTopOf="@+id/viewBlue"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/light_bulb_icon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
